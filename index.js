@@ -15,7 +15,7 @@ function checkForDeletes() {
       .catch(err => {
         log(err.response);
         if (err.response.body.error_code != 429) {
-          bot.sendMessage(chatId, "**Deleted by " + msg.from.first_name + "**:\n" + msg.text);
+          bot.sendMessage(chatId, "_Deleted by " + msg.from.first_name + ":_ \n" + msg.text, {parse_mode: "Markdown"});
         }
         cache = [];
       });
@@ -26,7 +26,7 @@ function checkForDeletes() {
 bot.onText(/\/hello/, (msg, match) => {
   const chatId = msg.chat.id;
 
-  bot.sendMessage(chatId, "Deleters beware.");
+  bot.sendMessage(chatId, "Deleters beware. (Trevor)");
 });
 
 bot.onText(/.*/, (msg, match) => {
@@ -46,5 +46,5 @@ bot.onText(/.*/, (msg, match) => {
   setTimeout(function () {
     checkForDeletes();
     loop();
-  }, 15000);
+  }, 10000);
 })();
