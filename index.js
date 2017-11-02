@@ -12,7 +12,10 @@ function checkForDeletes() {
     bot.forwardMessage("@catchersmitt", chatId, msg.message_id)
       .then(res => {})
       .catch(err => {
-        bot.sendMessage(chatId, "DELETED BY " + msg.from.first_name + ": " + msg.text);
+        console.log(err);
+        if (err.response.body.error_code != 429) {
+          bot.sendMessage(chatId, "DELETED BY " + msg.from.first_name + ": " + msg.text);
+        }
         cache = [];
       });
   });
@@ -22,7 +25,7 @@ function checkForDeletes() {
   setTimeout(function () {
     checkForDeletes();
     loop();
-  }, 5000);
+  }, 16000);
 })();
 
 
@@ -38,7 +41,7 @@ bot.onText(/.*/, (msg, match) => {
   checkForDeletes();
 
   cache.push(msg);
-  if (cache.length > 10) {
+  if (cache.length > 4) {
     cache.reverse();
     cache.pop();
     cache.reverse();
