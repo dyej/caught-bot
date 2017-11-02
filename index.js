@@ -3,6 +3,7 @@ const TelegramBot = require('node-telegram-bot-api');
 const token = process.env.TOKEN;
 const bot = new TelegramBot(token, {polling: true});
 const fs = require('fs');
+const log = require('./log');
 
 let cache = [];
 let chatId = null;
@@ -12,22 +13,14 @@ function checkForDeletes() {
     bot.forwardMessage("@catchersmitt", chatId, msg.message_id)
       .then(res => {})
       .catch(err => {
-        console.log(err);
+        log(err.response);
         if (err.response.body.error_code != 429) {
-          bot.sendMessage(chatId, "DELETED BY " + msg.from.first_name + ": " + msg.text);
+          bot.sendMessage(chatId, "**Deleted by " + msg.from.first_name + "**:\n" + msg.text);
         }
         cache = [];
       });
   });
 }
-
-(function loop () {
-  setTimeout(function () {
-    checkForDeletes();
-    loop();
-  }, 16000);
-})();
-
 
 
 bot.onText(/\/hello/, (msg, match) => {
@@ -37,14 +30,21 @@ bot.onText(/\/hello/, (msg, match) => {
 });
 
 bot.onText(/.*/, (msg, match) => {
+  log(msg);
   chatId = msg.chat.id;
-  checkForDeletes();
 
   cache.push(msg);
-  if (cache.length > 4) {
+  if (cache.length > 5) {
     cache.reverse();
     cache.pop();
     cache.reverse();
   }
-  // console.log(cache[0].text);
 });
+
+
+(function loop () {
+  setTimeout(function () {
+    checkForDeletes();
+    loop();
+  }, 15000);
+})();
